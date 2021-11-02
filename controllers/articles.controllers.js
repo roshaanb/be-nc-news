@@ -1,4 +1,4 @@
-const { fetchArticleById, getIds } = require("../models/articles.models");
+const { fetchArticleById, fetchIds } = require("../models/articles.models");
 
 exports.getArticle = (req, res, next) => {
   const { article_id } = req.params;
@@ -12,8 +12,15 @@ exports.getArticle = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  getIds().then((ids) => {
-    ids.map((id) => fetchArticleById(id));
-    console.log(ids);
+  fetchIds().then((ids) => {
+    const results = [];
+    ids.forEach((id) => {
+      fetchArticleById(id).then((article) => {
+        results.push(article);
+        if (results.length === ids.length) {
+          res.status(200).send({ articles: results });
+        }
+      });
+    });
   });
 };

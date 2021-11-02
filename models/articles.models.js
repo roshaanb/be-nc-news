@@ -14,7 +14,7 @@ exports.fetchArticleById = (article_id) => {
   });
 };
 
-exports.getIds = () => {
+exports.fetchIds = () => {
   return db
     .query("SELECT * FROM articles")
     .then(({ rows }) => {

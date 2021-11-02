@@ -93,6 +93,25 @@ describe("app", () => {
             });
           });
       });
+      test("status:200 each article object's author key matches the relevant users table", () => {
+        const query = "SELECT * FROM users;";
+        const usernames = [];
+        return db
+          .query(query)
+          .then(({ rows }) => {
+            rows.forEach((user) => usernames.push(user.username));
+          })
+          .then(() => {
+            return request(app)
+              .get("/api/articles")
+              .expect(200)
+              .then(({ body: { articles } }) => {
+                articles.forEach((article) => {
+                  expect(usernames).toContain(article.author);
+                });
+              });
+          });
+      });
     });
   });
 });
