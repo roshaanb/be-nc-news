@@ -13,3 +13,15 @@ exports.fetchArticleById = (article_id) => {
     });
   });
 };
+
+exports.getIds = () => {
+  return db
+    .query("SELECT * FROM articles")
+    .then(({ rows }) => {
+      const idsArray = [];
+      rows.forEach((article) => {
+        idsArray.push(article.article_id);
+      });
+      return idsArray;
+    })
+};
