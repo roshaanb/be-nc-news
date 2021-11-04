@@ -14,14 +14,15 @@ exports.fetchArticleById = (article_id) => {
   });
 };
 
-exports.fetchIds = () => {
-  return db
-    .query("SELECT * FROM articles")
-    .then(({ rows }) => {
-      const idsArray = [];
-      rows.forEach((article) => {
-        idsArray.push(article.article_id);
-      });
-      return idsArray;
-    })
+exports.fetchIds = (sort_by, order, topic) => {
+  
+  const { sort_by, order, topic } = req.params;
+
+  return db.query("SELECT * FROM articles").then(({ rows }) => {
+    const idsArray = [];
+    rows.forEach((article) => {
+      idsArray.push(article.article_id);
+    });
+    return idsArray;
+  });
 };

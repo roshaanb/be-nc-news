@@ -12,15 +12,19 @@ exports.getArticle = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  fetchIds().then((ids) => {
-    const results = [];
-    ids.forEach((id) => {
-      fetchArticleById(id).then((article) => {
-        results.push(article);
-        if (results.length === ids.length) {
-          res.status(200).send({ articles: results });
-        }
+  fetchIds()
+    .then((ids) => {
+      const results = [];
+      ids.forEach((id) => {
+        fetchArticleById(id).then((article) => {
+          results.push(article);
+          if (results.length === ids.length) {
+            res.status(200).send({ articles: results });
+          }
+        });
       });
+    })
+    .catch((err) => {
+      next(err);
     });
-  });
 };
