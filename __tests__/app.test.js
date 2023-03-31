@@ -4,6 +4,17 @@ const testData = require("../db/data/test-data/index.js");
 const seed = require("../db/seeds/seed.js");
 const app = require("../app.js");
 
+const articleObj = {
+  article_id: expect.any(Number),
+  title: expect.any(String),
+  body: expect.any(String),
+  votes: expect.any(Number),
+  topic: expect.any(String),
+  author: expect.any(String),
+  created_at: expect.any(String),
+  comment_count: expect.any(Number),
+};
+
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
@@ -33,16 +44,7 @@ describe("app", () => {
           .get("/api/articles/1")
           .expect(200)
           .then(({ body: { article } }) => {
-            expect(article).toMatchObject({
-              article_id: expect.any(Number),
-              title: expect.any(String),
-              body: expect.any(String),
-              votes: expect.any(Number),
-              topic: expect.any(String),
-              author: expect.any(String),
-              created_at: expect.any(String),
-              comment_count: expect.any(Number),
-            });
+            expect(article).toMatchObject(articleObj);
           });
       });
       test("status:200 article object's author key matches the relevant users table", () => {
@@ -80,16 +82,7 @@ describe("app", () => {
           .expect(200)
           .then(({ body: { articles } }) => {
             articles.forEach((article) => {
-              expect(article).toMatchObject({
-                article_id: expect.any(Number),
-                title: expect.any(String),
-                body: expect.any(String),
-                votes: expect.any(Number),
-                topic: expect.any(String),
-                author: expect.any(String),
-                created_at: expect.any(String),
-                comment_count: expect.any(Number),
-              });
+              expect(article).toMatchObject(articleObj);
             });
           });
       });

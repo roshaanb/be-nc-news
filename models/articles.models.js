@@ -14,9 +14,9 @@ exports.fetchArticleById = (article_id) => {
   });
 };
 
-exports.fetchIds = (sort_by, order, topic) => {
-  
-  const { sort_by, order, topic } = req.params;
+exports.fetchIds = () => {
+  // console.log(req.params)
+  // const { sort_by, order, topic } = req.params;
 
   return db.query("SELECT * FROM articles").then(({ rows }) => {
     const idsArray = [];
