@@ -3,7 +3,6 @@ const format = require("pg-format");
 
 const seed = (data) => {
   const { articleData, commentData, topicData, userData } = data;
-
   return db
     .query(
       `DROP TABLE IF EXISTS
@@ -57,9 +56,10 @@ const seed = (data) => {
       );
     })
     .then(() => {
-      const topicsArr = topicData.map((topic) => {
-        return [topic.description, topic.slug];
-      });
+      const topicsArr = topicData.map((topic) => [
+        topic.description,
+        topic.slug,
+      ]);
       const topicsInsertStr = format(
         `INSERT INTO topics
           (description, slug)
@@ -70,9 +70,11 @@ const seed = (data) => {
       return db.query(topicsInsertStr);
     })
     .then(() => {
-      const usersArr = userData.map((user) => {
-        return [user.username, user.name, user.avatar_url];
-      });
+      const usersArr = userData.map((user) => [
+        user.username,
+        user.name,
+        user.avatar_url,
+      ]);
 
       const usersInsertStr = format(
         `INSERT INTO users
@@ -84,16 +86,14 @@ const seed = (data) => {
       return db.query(usersInsertStr);
     })
     .then(() => {
-      const articlesArr = articleData.map((article) => {
-        return [
-          article.title,
-          article.topic,
-          article.author,
-          article.body,
-          article.created_at,
-          article.votes,
-        ];
-      });
+      const articlesArr = articleData.map((article) => [
+        article.title,
+        article.topic,
+        article.author,
+        article.body,
+        article.created_at,
+        article.votes,
+      ]);
 
       const articlesInsertStr = format(
         `INSERT INTO articles
@@ -105,15 +105,13 @@ const seed = (data) => {
       return db.query(articlesInsertStr);
     })
     .then(() => {
-      const commentsArr = commentData.map((comment) => {
-        return [
-          comment.body,
-          comment.votes,
-          comment.author,
-          comment.article_id,
-          comment.created_at,
-        ];
-      });
+      const commentsArr = commentData.map((comment) => [
+        comment.body,
+        comment.votes,
+        comment.author,
+        comment.article_id,
+        comment.created_at,
+      ]);
 
       const commentsInsertStr = format(
         `INSERT INTO comments

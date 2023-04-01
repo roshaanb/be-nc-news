@@ -15,7 +15,6 @@ exports.fetchArticleById = (article_id) => {
 };
 
 exports.fetchIds = () => {
-  // console.log(req.params)
   // const { sort_by, order, topic } = req.params;
 
   return db.query("SELECT * FROM articles").then(({ rows }) => {

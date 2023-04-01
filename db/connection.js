@@ -1,3 +1,5 @@
+// this is the connection to the database
+
 const { Pool } = require("pg");
 const ENV = process.env.NODE_ENV || "test";
 
