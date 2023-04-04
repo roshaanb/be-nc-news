@@ -1,7 +1,6 @@
 const { fetchArticleById, fetchIds } = require("../models/articles.models");
 
 exports.getArticle = (req, res, next) => {
-  console.log(req.body);
   const { article_id } = req.params;
   fetchArticleById(article_id)
     .then((article) => {
@@ -11,6 +10,8 @@ exports.getArticle = (req, res, next) => {
       next(err);
     });
 };
+
+exports.patchArticle = (req, res, next) => {};
 
 exports.getArticles = (req, res, next) => {
   fetchIds()
