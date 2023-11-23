@@ -1,8 +1,29 @@
-const { fetchArticleById, fetchIds } = require("../models/articles.models");
+const {
+  fetchArticleById,
+  fetchAllArticles,
+  updateArticle,
+} = require("../models/articles.models");
 
 exports.getArticle = (req, res, next) => {
   const { article_id } = req.params;
   fetchArticleById(article_id)
+    .then((article) => {
+      if (article.type === "Error") {
+        // res.status(404).json({ msg: "barb" });
+        next({ code: "P0002" });
+      } else {
+        res.status(200).send({ article });
+      }
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.patchArticle = (req, res, next) => {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+  updateArticle(inc_votes, article_id)
     .then((article) => {
       res.status(200).send({ article });
     })
@@ -11,10 +32,8 @@ exports.getArticle = (req, res, next) => {
     });
 };
 
-exports.patchArticle = (req, res, next) => {};
-
-exports.getArticles = (req, res, next) => {
-  fetchIds()
+exports.getAllArticles = (req, res, next) => {
+  fetchAllArticles()
     .then((ids) => {
       const results = [];
       ids.forEach((id) => {

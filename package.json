@@ -6,7 +6,8 @@
   "scripts": {
     "setup-dbs": "psql -f ./db/setup.sql",
     "seed": "node ./db/seeds/run-seed.js",
-    "test": "psql -f ./db/setup.sql && PGDATABASE=nc_news_test jest"
+    "test": "psql -f ./db/setup.sql && PGDATABASE=nc_news_test jest",
+    "dev": "npm run seed && nodemon listen.js"
   },
   "repository": {
     "type": "git",

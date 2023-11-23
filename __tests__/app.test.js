@@ -67,12 +67,41 @@ describe("app", () => {
               });
           });
       });
-      test("status:400 responds with an invalid input error when passed an invalid article id", () => {
+      test("status:400 responds with an invalid article id error when passed a string for article id", () => {
         return request(app)
           .get("/api/articles/gabagool")
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("Invalid input");
+            expect(body.msg).toBe("Invalid article id");
+          });
+      });
+      test("status:404 responds with an article not found error when passed an invalid number for article id", () => {
+        return request(app)
+          .get("/api/articles/999")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Article not found");
+          });
+      });
+    });
+    describe("PATCH", () => {
+      test("status 200: responds with updated article object and increments votes", () => {
+        // fetch the original votes before the PATCH
+        return db
+          .query("SELECT votes FROM articles WHERE article_id = 1")
+          .then(({ rows }) => {
+            const originalVotes = rows[0].votes;
+
+            // perform the PATCH request
+            return request(app)
+              .patch("/api/articles/1")
+              .send({ inc_votes: -50 })
+              .expect(200)
+              .then(({ body: { article } }) => {
+                const expectedVotes = originalVotes - 50;
+                articlesExpectStatement(article);
+                expect(article).toHaveProperty("votes", expectedVotes);
+              });
           });
       });
     });

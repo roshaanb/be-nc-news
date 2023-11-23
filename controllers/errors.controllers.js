@@ -1,6 +1,12 @@
 exports.handlePSQLErrors = (err, req, res, next) => {
-  if (err.code === "22P02") {
-    res.status(400).send({ msg: "Invalid input" });
+  const psqlErrorCodes = {
+    "22P02": { status: 400, msg: "Invalid article id" },
+    "P0002": { status: 404, msg: "Article not found" },
+  };
+  if (err.code) {
+    res
+      .status(psqlErrorCodes[err.code].status)
+      .send({ msg: psqlErrorCodes[err.code].msg });
   } else {
     next(err);
   }
