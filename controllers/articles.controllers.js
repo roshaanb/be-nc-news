@@ -8,12 +8,7 @@ exports.getArticle = (req, res, next) => {
   const { article_id } = req.params;
   fetchArticleById(article_id)
     .then((article) => {
-      if (article.type === "Error") {
-        // res.status(404).json({ msg: "barb" });
-        next({ code: "P0002" });
-      } else {
-        res.status(200).send({ article });
-      }
+      res.status(200).send({ article });
     })
     .catch((err) => {
       next(err);

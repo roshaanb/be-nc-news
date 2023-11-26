@@ -13,6 +13,9 @@
     "type": "git",
     "url": "git+https://github.com/northcoders/be-nc-news.git"
   },
+  "jest": {
+    "setupFilesAfterEnv": ["jest-sorted"]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -29,6 +32,7 @@
     "pg-format": "^1.0.4"
   },
   "devDependencies": {
+    "jest-sorted": "^1.0.14",
     "supertest": "^6.1.6"
   }
 }

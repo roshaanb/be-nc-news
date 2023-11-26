@@ -86,13 +86,10 @@ describe("app", () => {
     });
     describe("PATCH", () => {
       test("status 200: responds with updated article object and increments votes", () => {
-        // fetch the original votes before the PATCH
         return db
           .query("SELECT votes FROM articles WHERE article_id = 1")
           .then(({ rows }) => {
             const originalVotes = rows[0].votes;
-
-            // perform the PATCH request
             return request(app)
               .patch("/api/articles/1")
               .send({ inc_votes: -50 })
@@ -102,6 +99,38 @@ describe("app", () => {
                 articlesExpectStatement(article);
                 expect(article).toHaveProperty("votes", expectedVotes);
               });
+          });
+      });
+      test("status 400: responds with a value required error when not passed a value for inc_votes", () => {
+        return request(app)
+          .patch("/api/articles/1")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe(
+              "Value for inc_votes required and should be an integer"
+            );
+          });
+      });
+      test("status 400: responds with invalid input error when passed a string for inc_votes", () => {
+        return request(app)
+          .patch("/api/articles/1")
+          .send({ inc_votes: "barb" })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe(
+              "Value for inc_votes required and should be an integer"
+            );
+          });
+      });
+      test("status 400: responds with invalid input error when passed a decimal for inc_votes", () => {
+        return request(app)
+          .patch("/api/articles/1")
+          .send({ inc_votes: -3.1415 })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe(
+              "Value for inc_votes required and should be an integer"
+            );
           });
       });
     });
@@ -135,6 +164,24 @@ describe("app", () => {
                   expect(usernames).toContain(article.author);
                 });
               });
+          });
+      });
+      test("status:200 array of article objects sorted by date descending by default", () => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            console.log(articles);
+            expect(articles).toBeSortedBy("created_at", { descending: true });
+          });
+      });
+      test("status:200 articles sorted by author", () => {
+        return request(app)
+          .get("/api/articles/")
+          .query({ sort_by: "author" })
+          .expect(200)
+          .then(({ body: { articles } }) => {
+            expect(articles).toBeSortedBy("author");
           });
       });
     });
