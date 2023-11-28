@@ -46,15 +46,14 @@ describe("app", () => {
         return request(app)
           .get("/api/articles/1")
           .expect(200)
-          .then(({ body: { article } }) => {
+          .then(({ body: [article] }) => {
             articlesExpectStatement(article);
           });
       });
       test("status:200 article object's author key matches the relevant users table", () => {
-        const query = "SELECT * FROM users;";
         const usernames = [];
         return db
-          .query(query)
+          .query("SELECT * FROM users;")
           .then(({ rows }) => {
             rows.forEach((user) => usernames.push(user.username));
           })
@@ -62,7 +61,8 @@ describe("app", () => {
             return request(app)
               .get("/api/articles/1")
               .expect(200)
-              .then(({ body: { article } }) => {
+              .then(({ body: [article] }) => {
+                articlesExpectStatement(article);
                 expect(usernames).toContain(article.author);
               });
           });
@@ -94,11 +94,17 @@ describe("app", () => {
               .patch("/api/articles/1")
               .send({ inc_votes: -50 })
               .expect(200)
-              .then(({ body: { article } }) => {
-                const expectedVotes = originalVotes - 50;
-                articlesExpectStatement(article);
-                expect(article).toHaveProperty("votes", expectedVotes);
-              });
+              .then(
+                ({
+                  body: {
+                    article: [article],
+                  },
+                }) => {
+                  const expectedVotes = originalVotes - 50;
+                  articlesExpectStatement(article);
+                  expect(article).toHaveProperty("votes", expectedVotes);
+                }
+              );
           });
       });
       test("status 400: responds with a value required error when not passed a value for inc_votes", () => {
@@ -141,26 +147,25 @@ describe("app", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
-          .then(({ body: { articles } }) => {
+          .then(({ body: articles }) => {
             articles.forEach((article) => {
               articlesExpectStatement(article);
             });
           });
       });
-      test("status:200 each article object's author key matches the relevant users table", () => {
-        const query = "SELECT * FROM users;";
-        const usernames = [];
+      test("status:200 each article's author key matches the relevant users table", () => {
         return db
-          .query(query)
+          .query("SELECT * FROM users;")
           .then(({ rows }) => {
-            rows.forEach((user) => usernames.push(user.username));
+            return (usernames = rows.map((user) => user.username));
           })
           .then(() => {
             return request(app)
               .get("/api/articles")
               .expect(200)
-              .then(({ body: { articles } }) => {
+              .then(({ body: articles }) => {
                 articles.forEach((article) => {
+                  articlesExpectStatement(article);
                   expect(usernames).toContain(article.author);
                 });
               });
@@ -170,18 +175,86 @@ describe("app", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
-          .then(({ body: { articles } }) => {
-            console.log(articles);
+          .then(({ body: articles }) => {
+            articles.forEach((article) => {
+              articlesExpectStatement(article);
+            });
             expect(articles).toBeSortedBy("created_at", { descending: true });
           });
       });
-      test("status:200 articles sorted by author", () => {
+      test("status:200 articles sorted by author in ascending order", () => {
         return request(app)
           .get("/api/articles/")
-          .query({ sort_by: "author" })
+          .query({ sort_by: "author", order: "asc" })
           .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles).toBeSortedBy("author");
+          .then(({ body: articles }) => {
+            articles.forEach((article) => {
+              articlesExpectStatement(article);
+            });
+            expect(articles).toBeSortedBy("author", { descending: false });
+          });
+      });
+      test("status:200 articles sorted by comment_count in descending order", () => {
+        return request(app)
+          .get("/api/articles/")
+          .query({ sort_by: "comment_count", order: "desc" })
+          .expect(200)
+          .then(({ body: articles }) => {
+            articles.forEach((article) => {
+              articlesExpectStatement(article);
+            });
+            expect(articles).toBeSortedBy("comment_count", {
+              descending: true,
+            });
+          });
+      });
+      test("status:200 articles filters by topic", () => {
+        return request(app)
+          .get("/api/articles")
+          .query({ topic: "mitch" })
+          .expect(200)
+          .then(({ body: articles }) => {
+            const topics = [articles[0].topic];
+            articles.forEach((article) => {
+              articlesExpectStatement(article);
+              expect(topics).toContain(article.topic);
+            });
+          });
+      });
+      test("status:400 responds with an invalid sort_by query error when passed an incorrect input for sort_by", () => {
+        return request(app)
+          .get("/api/articles/")
+          .query({ sort_by: "gabagool" })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Invalid sort_by query");
+          });
+      });
+      test("status:400 responds with an invalid order query error when passed an incorrect input for order", () => {
+        return request(app)
+          .get("/api/articles/")
+          .query({ order: 31415 })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Invalid order query");
+          });
+      });
+      test("status:400 responds with an invalid topic query error when passed an incorrect input for topic", () => {
+        return request(app)
+          .get("/api/articles/")
+          .query({ topic: ";;;" })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Topic must be a string");
+          });
+      });
+      test("status:404 responds with a topic not found error when passed an invalid topic string", () => {
+        return request(app)
+          .get("/api/articles/")
+          .query({ topic: "barb" })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Topic not found");
           });
       });
     });

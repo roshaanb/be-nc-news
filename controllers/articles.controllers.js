@@ -8,7 +8,7 @@ exports.getArticle = (req, res, next) => {
   const { article_id } = req.params;
   fetchArticleById(article_id)
     .then((article) => {
-      res.status(200).send({ article });
+      res.status(200).send(article);
     })
     .catch((err) => {
       next(err);
@@ -28,17 +28,10 @@ exports.patchArticle = (req, res, next) => {
 };
 
 exports.getAllArticles = (req, res, next) => {
-  fetchAllArticles()
-    .then((ids) => {
-      const results = [];
-      ids.forEach((id) => {
-        fetchArticleById(id).then((article) => {
-          results.push(article);
-          if (results.length === ids.length) {
-            res.status(200).send({ articles: results });
-          }
-        });
-      });
+  const { sort_by, order, topic } = req.query;
+  fetchAllArticles(sort_by, order, topic)
+    .then((articles) => {
+      res.status(200).send(articles);
     })
     .catch((err) => {
       next(err);
