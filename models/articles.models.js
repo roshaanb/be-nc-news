@@ -61,7 +61,8 @@ exports.fetchArticleById = (article_id) => {
     )
     .then(({ rows }) => {
       if (rows.length < 1) throw { statusCode: 404, msg: "Article not found" };
-      return rows;
+      console.log(rows[0]);
+      return rows[0];
     });
 };
 
@@ -79,10 +80,9 @@ exports.updateArticle = (inc_votes, article_id) => {
   return db
     .query(
       `UPDATE articles
-        SET votes = votes + $1
-        WHERE article_id = $2
-        RETURNING *`,
-      [inc_votes, article_id]
+        SET votes = votes + ${inc_votes}
+        WHERE article_id = ${article_id}
+        RETURNING *`
     )
     .then(({ rows }) => {
       const updatedArticle = rows[0];

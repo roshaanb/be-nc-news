@@ -20,7 +20,7 @@ exports.patchArticle = (req, res, next) => {
   const { inc_votes } = req.body;
   updateArticle(inc_votes, article_id)
     .then((article) => {
-      res.status(200).send({ article });
+      res.status(200).send(article);
     })
     .catch((err) => {
       next(err);

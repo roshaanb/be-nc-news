@@ -5,23 +5,103 @@
   "GET /api/topics": {
     "description": "serves an array of all topics",
     "queries": [],
+    "exampleResponse": [{ "slug": "football", "description": "Footie!" }]
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves an article object specified by article_id",
+    "queries": [],
     "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
+      "article_id": 12,
+      "title": "Yeah buddy",
+      "body": "Text from the article..",
+      "votes": 3,
+      "topic": "bodybuilding",
+      "author": "ronniec",
+      "created_at": 1527695953341,
+      "comment_count": 8
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "serves an article object specified by article_id with the votes value incremented by inc_votes",
+    "queries": {},
+    "exampleRequest": { "inc_votes": 13 },
+    "exampleResponse": {
+      "article_id": 12,
+      "title": "Yeah buddy",
+      "body": "Text from the article..",
+      "votes": 15,
+      "topic": "bodybuilding",
+      "author": "ronniec",
+      "created_at": 1527695953341,
+      "comment_count": 8
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "serves an array of all articles",
+    "queries": {
+      "sort_by": "sorts the articles by any valid column (defaults to date)",
+      "order": "asc/desc (defaults to descending)",
+      "topic": "filters the articles by the topic value specified in the query"
+    },
+    "exampleResponse": [
+      {
+        "article_id": 34,
+        "title": "Seafood substitutions are increasing",
+        "body": "Text from the article..",
+        "votes": 0,
+        "topic": "cooking",
+        "author": "weegembump",
+        "created_at": 1527695953340,
+        "comment_count": 4
+      },
+      {
+        "article_id": 12,
+        "title": "Yeah buddy",
+        "body": "Text from the article..",
+        "votes": 3,
+        "topic": "bodybuilding",
+        "author": "ronniec",
+        "created_at": 1527695953341,
+        "comment_count": 8
+      }
+    ]
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves an array of all comments for the given article_id",
+    "queries": {},
+    "exampleResponse": [
+      {
+        "comment_id": 2,
+        "votes": 2,
+        "created_at": 1527695953341,
+        "author": "barb",
+        "body": "bad."
+      },
+      {
+        "comment_id": 14,
+        "votes": -4,
+        "created_at": 1527695953341,
+        "author": "swaos",
+        "body": "Iure quas est omnis porro"
+      }
+    ]
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "posts and serves a new comment to the article given by article_id with the request username and body",
+    "queries": {},
+    "exampleRequest": { "username": "ronniec", "body": "lightweight" },
     "exampleResponse": {
-      "articles": [
-        {
-          "title": "Seafood substitutions are increasing",
-          "topic": "cooking",
-          "author": "weegembump",
-          "body": "Text from the article..",
-          "created_at": 1527695953341
-        }
-      ]
+      "comment_id": 301,
+      "author": "ronniec",
+      "article_id": 4,
+      "votes": 0,
+      "created_at": 1527695953341,
+      "body": "lightweight"
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes the comment given by comment_id",
+    "queries": {},
+    "exampleResponse": {}
   }
 }
